@@ -19,7 +19,8 @@ def check_password():
             submit_button = st.form_submit_button("Login")
             
             if submit_button:
-                if password_input == "Mihir@2026":
+                # Mihir@2026 ko direct likhne ki jagah secrets se uthayein
+                if password_input == st.secrets["app_password"]: 
                     st.session_state["password_correct"] = True
                     st.rerun()
                 else:
