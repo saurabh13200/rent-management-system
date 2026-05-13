@@ -5,7 +5,12 @@ from fpdf import FPDF
 import base64
 from datetime import datetime
 import math
+from logic import check_login_status
 
+# Isko call karte hi page block ho jayega agar login nahi hai
+check_login_status()
+
+# ... aapka baaki ka sara code yahan se shuru hoga ...
 # --- 1. CONFIG & DATA LOADING ---
 st.set_page_config(page_title="Settings & Backups", layout="wide")
 
