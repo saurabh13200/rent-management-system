@@ -334,14 +334,20 @@ def render_agreement_workflow(tenant, df_tenants, sync_callback):
                 return None
             start_dt = f[1].date_input("Agreement Start Date", value=get_date('Agreement_Start_Date'), min_value=MIN_DATE, max_value=MAX_DATE, key=f"ag_dt_{t_rid}")
             pay_dt = f[1].date_input("Payment Date", value=get_date('Agreement_Paid_Date'), min_value=MIN_DATE, max_value=MAX_DATE, key=f"ag_pay_dt_{t_rid}")
+            # --- logic.py mein Agreement Logic wala hissa ---
             if st.form_submit_button("Save Agreement Details"):
+                # ERROR FIX: Update se pehle DataFrame ko flexible banayein
+                df_tenants = df_tenants.astype(object) 
+                
                 t_idx = df_tenants[df_tenants['Tenant_Name'] == tenant['Tenant_Name']].index[0]
                 df_tenants.at[t_idx, 'Agreement_Total_Amount'] = total_ag_amt
                 df_tenants.at[t_idx, 'Agreement_Amount_Paid'] = p_fees + add_pay
                 df_tenants.at[t_idx, 'Agreement_Payment_Status'] = status
-                df_tenants.at[t_idx, 'Agreement_No'] = ag_no
+                # Force string to avoid 'nan' float error
+                df_tenants.at[t_idx, 'Agreement_No'] = str(ag_no) 
                 df_tenants.at[t_idx, 'Agreement_Start_Date'] = str(start_dt) if start_dt else ""
                 df_tenants.at[t_idx, 'Agreement_Paid_Date'] = str(pay_dt) if pay_dt else ""
+                
                 update_data(df_tenants, "Tenants")
                 st.session_state['master_tenants'] = df_tenants
                 st.success("Agreement Updated!")
