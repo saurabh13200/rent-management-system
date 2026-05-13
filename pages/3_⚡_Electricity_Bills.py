@@ -3,7 +3,12 @@ import pandas as pd
 from database import load_data, update_data
 from datetime import datetime, date
 from logic import render_electricity_logic
+from logic import check_login_status
 
+# Isko call karte hi page block ho jayega agar login nahi hai
+check_login_status()
+
+# ... aapka baaki ka sara code yahan se shuru hoga ...
 # --- 1. CONFIG & DATA LOAD ---
 st.set_page_config(page_title="Digital Register Pro", layout="wide", initial_sidebar_state="collapsed")
 
