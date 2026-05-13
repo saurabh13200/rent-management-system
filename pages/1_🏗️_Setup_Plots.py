@@ -1,7 +1,12 @@
 import streamlit as st
 import pandas as pd
 from database import load_data, update_data
+from logic import check_login_status
 
+# Isko call karte hi page block ho jayega agar login nahi hai
+check_login_status()
+
+# ... aapka baaki ka sara code yahan se shuru hoga ...
 st.header("Setup New Plots & Rooms")
 
 with st.form("add_plot"):
