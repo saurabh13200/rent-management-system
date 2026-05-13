@@ -346,3 +346,9 @@ def render_agreement_workflow(tenant, df_tenants, sync_callback):
                 st.session_state['master_tenants'] = df_tenants
                 st.success("Agreement Updated!")
                 st.rerun()
+
+# logic.py mein sabse niche ye add karein
+def check_login_status():
+    if "password_correct" not in st.session_state or not st.session_state["password_correct"]:
+        st.warning("🔒 Please login from the Home page first!")
+        st.stop() # Ye line aage ka code execute hone se rok degi
