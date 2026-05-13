@@ -20,26 +20,34 @@ def safe_num(val):
         if pd.isna(val) or str(val).strip() == "" or str(val).lower() == "nan": return 0.0
         return float(val)
     except: return 0.0
-
+  
 # --- 2. DATA LOADING ---
 if 'master_tenants' not in st.session_state:
-    st.session_state['master_tenants'] = load_data("Tenants")
-if 'master_rooms' not in st.session_state:
-    st.session_state['master_rooms'] = load_data("Plots_Rooms")
+    df_temp = load_data("Tenants")
+    if not df_temp.empty:
+        # Columns ko safely string mein convert kar rahe hain taaki 'nan' error na aaye
+        df_temp['Mobile'] = df_temp['Mobile'].astype(str).replace(['nan', 'NaN', 'None'], '')
+        df_temp['Alt_Mobile'] = df_temp['Alt_Mobile'].astype(str).replace(['nan', 'NaN', 'None'], '')
+    st.session_state['master_tenants'] = df_temp
 
 def sync_tenants():
     st.cache_data.clear()
-    st.session_state['master_tenants'] = load_data("Tenants")
+    df_temp = load_data("Tenants")
+    if not df_temp.empty:
+        df_temp['Mobile'] = df_temp['Mobile'].astype(str).replace(['nan', 'NaN', 'None'], '')
+        df_temp['Alt_Mobile'] = df_temp['Alt_Mobile'].astype(str).replace(['nan', 'NaN', 'None'], '')
+    st.session_state['master_tenants'] = df_temp
     st.session_state['master_rooms'] = load_data("Plots_Rooms")
     st.rerun()
 
-df_tenants = st.session_state['master_tenants']
-df_rooms = st.session_state['master_rooms']
-
 # Clean existing column names
+# Yeh lines check karein ki data theek se assign ho raha hai
+df_tenants = st.session_state.get('master_tenants', pd.DataFrame())
+df_rooms = st.session_state.get('master_rooms', pd.DataFrame())
+
+# Clean existing column names (Ab ye error nahi dega)
 if not df_tenants.empty:
     df_tenants.columns = df_tenants.columns.str.strip()
-
 # --- 3. UI LAYOUT ---
 st.title("👤 Tenant Management")
 tab1, tab2, tab3 = st.tabs(["➕ New Registration", "📝 Edit Details", "📋 Active List"])
@@ -169,6 +177,9 @@ with tab2:
                 new_status = st.radio("Status", ["Active", "Vacated"], horizontal=True, help="Vacated karne par room available ho jayega", key=f"edit_status_{sel_display_name}")
                 
                 if st.form_submit_button("💾 Update All Details", use_container_width=True):
+                    # Error Fix: DataFrame ko object type mein convert karein taaki text save ho sake
+                    df_tenants = df_tenants.astype(object) 
+                    # ... aapka baki ka update logic (df_tenants.at[...] = ...) waisa hi rahega
                     # Update the DataFrame
                     df_tenants.at[t_idx, 'Mobile'] = new_mob
                     df_tenants.at[t_idx, 'Alt_Mobile'] = new_alt
